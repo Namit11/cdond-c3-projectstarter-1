@@ -247,6 +247,8 @@ jobs:
           at: ~/
       - run:
           name: Configure server
+          # adding no_output_timeout as ansible has a pause for 10mins
+          no_output_timeout: 15m
           command: |
             cd .circleci/ansible
             ansible-playbook -i inventory.txt configure-server.yml
