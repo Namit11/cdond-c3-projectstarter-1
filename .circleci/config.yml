@@ -228,7 +228,7 @@ jobs:
   configure-infrastructure:
     docker:
       # Docker image here that supports Ansible
-      image: circleci/python:3.10.0
+      - image: circleci/python:3.10.0
     steps:
       # Checkout code from git
       # Add ssh keys with fingerprint
@@ -243,7 +243,8 @@ jobs:
           fingerprints:
             - "0a:ee:44:f0:31:5b:df:2e:31:00:b7:99:00:24:8a:60"
       - attach_workspace:
-          - ~/
+          # https://circleci.com/docs/2.0/configuration-reference/
+          at: ~/
       - run:
           name: Configure server
           command: |
