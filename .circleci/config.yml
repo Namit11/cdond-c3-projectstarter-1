@@ -142,14 +142,28 @@ jobs:
           paths:
             - ~/usr/local/lib/node_modules
           key: v1-npm-frontend-deps-{{ .Branch }}-{{ checksum "frontend/package-lock.json" }}
-#
-#  scan-backend:
-#    docker:
-#      # Docker image here
-#    steps:
-#      # Checkout code from git
-#      # Restore from cache
-#      # Your job code here
+
+  scan-backend:
+    docker:
+      - image: circleci/node:13.8.0
+    steps:
+      - checkout
+      - restore_cache:
+          # https://circleci.com/docs/2.0/caching/
+          keys:
+            - v1-npm-backend-deps-{{ .Branch }}-{{ checksum "backend/package-lock.json" }}
+            - v1-npm-backend-deps-{{ .Branch }}-
+            - v1-npm-backend-deps-
+      - run:
+          name: Scan Back-end
+          command: |
+            cd backend
+            npm install
+            npm audit --audit-level=critical
+      - save_cache:
+          paths:
+            - ~/usr/local/lib/node_modules
+          key: v1-npm-backend-deps-{{ .Branch }}-{{ checksum "backend/package-lock.json" }}
 #
 #  deploy-infrastructure:
 #    docker:
@@ -328,8 +342,8 @@ workflows:
           requires: [build-backend]
       - scan-frontend:
           requires: [build-frontend]
-#      - scan-backend:
-#          requires: [build-backend]
+      - scan-backend:
+          requires: [build-backend]
 #      - deploy-infrastructure:
 #          requires: [test-frontend, test-backend, scan-frontend, scan-backend]
 #          filters:
