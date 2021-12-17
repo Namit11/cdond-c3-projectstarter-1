@@ -11,3 +11,4 @@
   npm:
     # https://docs.ansible.com/ansible/2.3/npm_module.html
     name: pm2
+    global: yes
