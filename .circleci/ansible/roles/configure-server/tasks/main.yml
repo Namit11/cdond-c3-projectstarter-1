@@ -1,0 +1,13 @@
+---
+- name: "install node and npm."
+  apt:
+    # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/apt_module.html
+    pkg:
+    - nodejs
+    - npm
+    update_cache: yes
+
+- name: "install pm2 node package."
+  npm:
+    # https://docs.ansible.com/ansible/2.3/npm_module.html
+    name: pm2

@@ -224,25 +224,32 @@ jobs:
       # Here's where you will add some code to rollback on failure
       - destroy-environment:
           deployment-id: ${CIRCLE_WORKFLOW_ID:0:7}
-#
-#  configure-infrastructure:
-#    docker:
-#      # Docker image here that supports Ansible
-#    steps:
-#      # Checkout code from git
-#      # Add ssh keys with fingerprint
-#      # attach workspace
-#      - run:
-#          name: Install dependencies
-#          command: |
-#            # Your code here
-#            exit 1
-#      - run:
-#          name: Configure server
-#          command: |
-#            # Your code here
-#            exit 1
-#      # Here's where you will add some code to rollback on failure
+
+  configure-infrastructure:
+    docker:
+      # Docker image here that supports Ansible
+      image: circleci/python:3.10.0
+    steps:
+      # Checkout code from git
+      # Add ssh keys with fingerprint
+      # attach workspace
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            sudo pip install ansible
+      - add_ssh_keys:
+          #https://circleci.com/docs/2.0/add-ssh-key
+          fingerprints:
+            - "0a:ee:44:f0:31:5b:df:2e:31:00:b7:99:00:24:8a:60"
+      - attach_workspace:
+          - ~/
+      - run:
+          name: Configure server
+          command: |
+            cd .circleci/ansible
+            ansible-playbook -i inventory.txt configure-server.yml
+      # Here's where you will add some code to rollback on failure
 #
 #  run-migrations:
 #    docker:
@@ -375,8 +382,8 @@ workflows:
           filters:
             branches:
               only: [master]
-#      - configure-infrastructure:
-#          requires: [deploy-infrastructure]
+      - configure-infrastructure:
+          requires: [deploy-infrastructure]
 #      - run-migrations:
 #          requires: [configure-infrastructure]
 #      - deploy-frontend:
