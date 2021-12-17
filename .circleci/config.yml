@@ -191,6 +191,8 @@ jobs:
       - image: amazon/aws-cli:2.4.6
     steps:
       - checkout
+      # tar is not included in aws-cli:2.4.6 image and is needed for persist_to_workspace
+      - run: yum install -y tar gzip
       - run:
           name: Ensure back-end infrastructure exists
           command: |
