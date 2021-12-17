@@ -6,9 +6,21 @@ commands:
     parameters:
       deployment-id:
         type: string
-    docker:
-      - image: amazon/aws-cli:2.4.6
     steps:
+      - run:
+          name: Install AWS Cli if required
+          when: on_fail
+          command: |
+            # https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
+            if ! command -v aws &> /dev/null
+            then
+              echo "couldnt not find aws command, installing..."
+              curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+              unzip awscliv2.zip
+              sudo ./aws/install
+            else
+              echo "aws command found, skipping install"
+            fi
       - run:
           name: Destroy environments
           when: on_fail
