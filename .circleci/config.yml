@@ -29,25 +29,22 @@ commands:
             aws s3 rb "s3://udapeople-<< parameters.deployment-id >>" --force
             aws cloudformation delete-stack --stack-name "udapeople-backend-<< parameters.deployment-id >>"
             aws cloudformation delete-stack --stack-name "udapeople-frontend-<< parameters.deployment-id >>"
-#
-#  revert-migrations:
-#    description: Revert the last migration if successfully run in the current workflow.
-#    parameters:
-#      # Add parameter here
-#    steps:
-#      - run:
-#          name: Revert migrations
-#          # Add when this will run
-#          command: |
-#            # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
-#            SUCCESS = 1
-#            if(( $SUCCESS==1 ));
-#            then
-#            #  cd ~/project/backend
-#            #  npm install
-#            #  Add revert code here. You can find this in the Getting Started section.
-#              exit 1
-#            fi
+
+  revert-migrations:
+    description: Revert the last migration if successfully run in the current workflow.
+    steps:
+      - run:
+          name: Revert migrations
+          when: on_fail
+          # Add when this will run
+          command: |
+            if grep -q "success" ~/migrations.status
+            then
+              cd ~/project/backend
+              npm install
+              npm run migration:revert
+            fi
+
 
 jobs:
   build-frontend:
@@ -262,6 +259,9 @@ jobs:
     steps:
       # Checkout code from git
       - checkout
+      - attach_workspace:
+          # https://circleci.com/docs/2.0/configuration-reference/
+          at: ~/
       - restore_cache:
           # https://circleci.com/docs/2.0/caching/
           keys:
@@ -279,35 +279,61 @@ jobs:
           name: Send migration results to memstash
           command: |
             # IMPORTANT: This section has been added but a the time of this assessment memstash.io is DOWN!
+            #            Using workspaces and flag files instead
             #
             #if grep -q "has been executed successfully." backend/migrations_dump.txt
             #then
             #  curl -H "Content-Type: text/plain" -H "token: 7933fe63-4687-4fa1-8426-aa25aa1730ec" --request PUT --data "1" https://api.memstash.io/values/migration_${CIRCLE_WORKFLOW_ID:0:7}
             #fi
+            #
+            if grep -q "has been executed successfully." backend/migrations_dump.txt
+            then
+              echo "success" > ~/migrations.status
+            else
+              echo "failed" > ~/migrations.status
+            fi
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - ~/migrations.success
      # Here's where you will add some code to rollback on failure
+      - revert-migrations
       - destroy-environment:
           deployment-id: ${CIRCLE_WORKFLOW_ID:0:7}
-#
-#  deploy-frontend:
-#    docker:
-#      # Docker image here that supports AWS CLI
-#    steps:
-#      # Checkout code from git
-#      - run:
-#          name: Install dependencies
-#          command: |
-#            # your code here
-#      - run:
-#          name: Get backend url
-#          command: |
-#            # your code here
-#            export API_URL="http://${BACKEND_IP}:3030"
-#            echo "${API_URL}"
-#      - run:
-#          name: Deploy frontend objects
-#          command: |
-#            # your code here
-#      # Here's where you will add some code to rollback on failure
+
+  deploy-frontend:
+    docker:
+      - image: amazon/aws-cli:2.4.6
+    steps:
+      # Checkout code from git
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            # your code here
+      - attach_workspace:
+          # https://circleci.com/docs/2.0/configuration-reference/
+          at: ~/
+      - run:
+          name: Get backend url
+          command: |
+            export BACKEND_IP=$(aws ec2 describe-instances --query "Reservations[*].Instances[*].PublicIpAddress" --filters Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7} --output text)
+            export API_URL="http://${BACKEND_IP}:3030"
+            echo "API_URL = ${API_URL}"
+            echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
+            cat frontend/.env
+      - run:
+          name: Deploy frontend objects
+          command: |
+            cd frontend
+            npm install
+            npm run build
+            tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
+            aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
+      # Here's where you will add some code to rollback on failure
+      - revert-migrations
+      - destroy-environment:
+          deployment-id: ${CIRCLE_WORKFLOW_ID:0:7}
 #
 #  deploy-backend:
 #    docker:
