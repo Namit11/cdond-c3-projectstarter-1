@@ -342,7 +342,7 @@ jobs:
           name: Install dependencies
           command: |
             sudo apt install python3-pip
-            sudo pip install ansible
+            sudo pip3 install ansible
       - add_ssh_keys:
           #https://circleci.com/docs/2.0/add-ssh-key
           fingerprints:
