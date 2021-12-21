@@ -333,7 +333,7 @@ jobs:
 
   deploy-backend:
     docker:
-      - image: circleci/python:3.10.0
+      - image: circleci/node:13.8.0
     steps:
       # Checkout code from git
       # Add ssh keys with fingerprint
@@ -341,6 +341,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
+            sudo apt install python3-pip
             sudo pip install ansible
       - add_ssh_keys:
           #https://circleci.com/docs/2.0/add-ssh-key
