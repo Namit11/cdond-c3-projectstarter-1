@@ -298,7 +298,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            # your code here
+            yum install -y tar gzip
       - attach_workspace:
           # https://circleci.com/docs/2.0/configuration-reference/
           at: ~/
