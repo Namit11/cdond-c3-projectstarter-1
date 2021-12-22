@@ -377,10 +377,10 @@ jobs:
       - image: amazon/aws-cli:2.4.6
     steps:
       # Checkout code from git - NOT REQUIRED
-#      - run:
-#          name: Install dependencies
-#          command: |
-#            # your code here
+      - run:
+          name: Install dependencies
+          command: |
+            yum install -y tar gzip
       - attach_workspace:
           # https://circleci.com/docs/2.0/configuration-reference/
           at: ~/
