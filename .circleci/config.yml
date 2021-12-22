@@ -442,7 +442,7 @@ jobs:
       - destroy-environment:
           deployment-id: ${CIRCLE_WORKFLOW_ID:0:7}
 
-cleanup:
+  cleanup:
     docker:
       - image: amazon/aws-cli:2.4.6
     steps:
