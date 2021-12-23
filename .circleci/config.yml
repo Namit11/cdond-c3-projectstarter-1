@@ -151,8 +151,6 @@ jobs:
           command: |
             cd frontend
             npm install
-            # Added to following audit fix get pipeline to parse <- do not do this
-            npm audit fix --audit-level=critical --force
             npm audit --audit-level=critical
       - save_cache:
           paths:
@@ -175,8 +173,6 @@ jobs:
           command: |
             cd backend
             npm install
-            # Added to following audit fix get pipeline to parse <- do not do this
-            npm audit fix --audit-level=critical --force
             npm audit --audit-level=critical
       - save_cache:
           paths:
