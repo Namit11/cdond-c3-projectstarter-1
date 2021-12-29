@@ -11,7 +11,7 @@ commands:
           name: Install AWS Cli if required
           when: on_fail
           command: |
-            # https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
+            ## https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
             if ! command -v aws &> /dev/null
             then
               echo "couldnt not find aws command, installing..."
