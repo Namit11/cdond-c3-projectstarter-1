@@ -237,7 +237,7 @@ jobs:
       - add_ssh_keys:
           #https://circleci.com/docs/2.0/add-ssh-key
           fingerprints:
-            - "0a:ee:44:f0:31:5b:df:2e:31:00:b7:99:00:24:8a:60"
+            - "f3:92:2a:99:3c:fe:d8:67:b3:29:d8:5d:5f:58:2d:eb"
       - run:
           name: Configure server
           # adding no_output_timeout as ansible has a pause for 10mins
@@ -349,7 +349,7 @@ jobs:
       - add_ssh_keys:
           #https://circleci.com/docs/2.0/add-ssh-key
           fingerprints:
-            - "0a:ee:44:f0:31:5b:df:2e:31:00:b7:99:00:24:8a:60"
+            - "f3:92:2a:99:3c:fe:d8:67:b3:29:d8:5d:5f:58:2d:eb"
       - run:
           name: Deploy backend
           command: |
