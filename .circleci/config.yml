@@ -236,8 +236,7 @@ jobs:
             sudo pip install ansible
       - add_ssh_keys:
           #https://circleci.com/docs/2.0/add-ssh-key
-          fingerprints:
-            - "f3:92:2a:99:3c:fe:d8:67:b3:29:d8:5d:5f:58:2d:eb"
+          fingerprints: ["f3:92:2a:99:3c:fe:d8:67:b3:29:d8:5d:5f:58:2d:eb"]
       - run:
           name: Configure server
           # adding no_output_timeout as ansible has a pause for 10mins
